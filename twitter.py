@@ -17,7 +17,7 @@ def _api():
 
 api = _api()
 
-def tweets(username, count=200):
+def tweets(username, count=200, page=0):
     """
     Returns 200 last tweets for a user.
     """
@@ -26,7 +26,7 @@ def tweets(username, count=200):
                 'tid': tweet.id,
                 'protected': tweet.user.protected,
                 'retweeted': tweet.retweeted
-            } for tweet in api.user_timeline(screen_name=username, count=count)]
+            } for tweet in api.user_timeline(screen_name=username, count=count, page=page)]
 
 def retweet(id):
     """
