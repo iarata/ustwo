@@ -7,6 +7,19 @@ import twitter
 import re
 from textblob import TextBlob
 
+ELIGIBLE_TAGS = [
+    'CD',   # numbers
+    'JJ',   # adjectives
+    'NN',   # nouns
+    'NNP',  # proper nouns
+    'NNPS', # plural proper nouns
+    'NNS',  # plural nouns
+    'VBN',
+    'VBG',
+    'VB',
+    'RB'    # adverbs
+]
+
 def main():
     try:
         import config
@@ -27,7 +40,7 @@ def main():
 def tweets():
     user_tweets = []
     for i in range(10):
-        user_tweets += twitter.tweets('frnsys', page=i)
+        user_tweets += twitter.tweets('brian_justie', page=i)
     with open('data/data.txt', 'w') as outfile:
         json.dump(user_tweets, outfile)
 
@@ -39,39 +52,40 @@ def process():
 
     # Chains of POS tags to build
     # tweets out of.
-    speech_patterns = {}
+    speech_patterns = []
     for tweet in json.load(f):
-        pattern_ = []
-
         if '@' not in tweet['body']:    # Trying without any @ mentions.
             text = tweet['body']
 
-            # Remove urls
+            # Remove urls and @mentions.
             text = re.sub(r"(?:\@|https?\://)\S+", "", text)
+            pattern = text
 
             for t in TextBlob(text).pos_tags:
                 token = t[0]
                 tag = t[1]
 
-                pattern_.append(tag)
-
-                if tag == '-NONE-':
+                # Preserve hashtags.
+                if token[0] == '#':
                     continue
 
-                if tag not in speech_parts:
-                    speech_parts[tag] = []
-                speech_parts[tag].append(token)
+                if tag in ELIGIBLE_TAGS and len(token) > 2:
+                    pattern = pattern.replace(token, '{{{{ {0} }}}}'.format(tag))
 
-            pattern = '.'.join(pattern_)
-            if pattern not in speech_patterns:
-                speech_patterns[pattern] = 0
-            speech_patterns[pattern] += 1
+                    if tag == '-NONE-':
+                        continue
+
+                    if tag not in speech_parts:
+                        speech_parts[tag] = []
+                    speech_parts[tag].append(token.lower())
+
+            speech_patterns.append(pattern)
 
     with open('data/speech_parts.json', 'w') as outfile:
-        json.dump(speech_parts, outfile)
+        json.dump(speech_parts, outfile, indent=4, sort_keys=True)
 
     with open('data/speech_patterns.json', 'w') as outfile:
-        json.dump(speech_patterns, outfile)
+        json.dump(speech_patterns, outfile, indent=4, sort_keys=True )
 
 def generate():
     with open('data/speech_parts.json', 'r') as f:
@@ -79,34 +93,17 @@ def generate():
     with open('data/speech_patterns.json', 'r') as f:
         speech_patterns = json.load(f)
 
-    pattern = _weighted_choice(speech_patterns)
+    pattern = random.choice(speech_patterns)
+    tweet = pattern
 
-    tweet = []
-    for tag in pattern.split('.'):
+    p = re.compile(r'\{\{\s*([A-Za-z]+)\s*\}\}')
+    tags = p.findall(pattern)
+
+    for tag in tags:
         token = random.choice(speech_parts[tag])
-        tweet.append(token)
-    print(' '.join(tweet))
+        tweet = re.sub(r'(\{\{\s*' + re.escape(tag) + r'\s*\}\})', token, tweet, 1)
+    print(tweet)
 
-
-def _weighted_choice(choices):
-    """
-    Random selects a key from a dictionary,
-    where each key's value is its probability weight.
-    """
-    # Randomly select a value between 0 and
-    # the sum of all the weights.
-    rand = random.uniform(0, sum(choices.values()))
-
-    # Seek through the dict until a key is found
-    # resulting in the random value.
-    summ = 0.0
-    for key, value in choices.items():
-        summ += value
-        if rand < summ: return key
-
-    # If this returns False,
-    # it's likely because the knowledge is empty.
-    return False
 
 
 if __name__ == '__main__':
