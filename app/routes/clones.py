@@ -15,7 +15,7 @@ def clones():
     form = CloneForm()
     if form.validate_on_submit():
         username = form.username.data
-        clone = Clone.objects.get_or_create(username=username)
+        clone, was_created = Clone.objects.get_or_create(username=username)
         clone.imprint()
         clone.save()
         return redirect(url_for('clones.clone', username=username))
