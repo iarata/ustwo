@@ -15,7 +15,7 @@ def clones():
     form = CloneForm()
     if form.validate_on_submit():
         username = form.username.data
-        if not Clone.objects.get(username):
+        if not Clone.objects.get(username=username):
             clone = Clone()
             clone.imprint(username)
             clone.save()
