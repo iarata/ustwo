@@ -11,10 +11,10 @@ class Clone(db.Document):
     username = db.StringField(required=True, unique=True)
 
     # Mad-lib Tweet patterns.
-    patterns = db.ListField(db.StringField(), required=True, default=[])
+    patterns = db.ListField(db.StringField(), default=[])
 
     # { POS tag: words }
-    vocabulary = db.DictField(required=True, default={})
+    vocabulary = db.DictField(default={})
 
     meta = {
             'allow_inheritance': True,
