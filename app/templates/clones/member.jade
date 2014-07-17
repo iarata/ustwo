@@ -1,0 +1,23 @@
+extends layout.jade
+
+block content
+    h1= clone.username
+
+    //- Generate a few samples.
+    ul
+        for i in range(10)
+            li= clone.speak()
+
+    h2 Patterns
+    ul
+        for pattern in clone.patterns
+            li= pattern|highlight_pattern|safe
+
+    h2 Vocabulary
+    ul
+        for pos in clone.vocabulary
+            li
+                h6= pos
+                ul
+                    for token in clone.vocabulary[pos]
+                        li= token

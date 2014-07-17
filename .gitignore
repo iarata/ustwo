@@ -11,4 +11,4 @@ config.py
 bower/
 index.css
 config.py
-data/
+db/

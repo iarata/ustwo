@@ -1,0 +1,9 @@
+extends layout.jade
+
+block content
+    form(action='', method='post')
+        {{ form.csrf_token() }}
+        .field
+            label Twitter Username
+            {{ form.username(autofocus=true) }}
+   h1 hi

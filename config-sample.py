@@ -14,3 +14,16 @@ TWITTER_CONSUMER_KEY = 'fill_me_in'
 TWITTER_CONSUMER_SECRET = 'fill_me_in'
 TWITTER_ACCESS_TOKEN = 'fill_me_in'
 TWITTER_ACCESS_SECRET = 'fill_me_in'
+
+ELIGIBLE_TAGS = [
+    'CD',   # numbers
+    'JJ',   # adjectives
+    'NN',   # nouns
+    'NNP',  # proper nouns
+    'NNPS', # plural proper nouns
+    'NNS',  # plural nouns
+    'VBN',
+    'VBG',
+    'VB',
+    'RB'    # adverbs
+]

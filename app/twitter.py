@@ -1,3 +1,6 @@
+import itertools
+import math
+
 import tweepy
 from tweepy import TweepError
 
@@ -17,16 +20,26 @@ def _api():
 
 api = _api()
 
-def tweets(username, count=200, page=0):
+MAX_COUNT = 200
+def tweets(username, count=200):
     """
-    Returns 200 last tweets for a user.
+    Returns tweets for a user.
     """
+    pages = math.ceil(count/MAX_COUNT) - 1
+    count = min(MAX_COUNT, count)
+
+    # This produces a list of lists.
+    tweets_ = [api.user_timeline(screen_name=username, count=count, page=i) for i in range(pages)]
+
+    # This flattens the list of lists.
+    tweets = list(itertools.chain.from_iterable(tweets_))
+
     return [{
                 'body': tweet.text,
                 'tid': tweet.id,
                 'protected': tweet.user.protected,
                 'retweeted': tweet.retweeted
-            } for tweet in api.user_timeline(screen_name=username, count=count, page=page)]
+            } for tweet in tweets]
 
 def retweet(id):
     """
