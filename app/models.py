@@ -9,8 +9,12 @@ from app import db, twitter
 class Clone(db.Document):
     created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
     username = db.StringField(required=True, unique=True)
-    patterns = db.ListField(db.StringField(), required=True)
-    vocabulary = db.DictField(required=True)
+
+    # Mad-lib Tweet patterns.
+    patterns = db.ListField(db.StringField(), required=True, default=[])
+
+    # { POS tag: words }
+    vocabulary = db.DictField(required=True, default={})
 
     meta = {
             'allow_inheritance': True,
@@ -18,18 +22,11 @@ class Clone(db.Document):
             'ordering': ['-created_at']
     }
 
-    def imprint(self, username):
+    def imprint(self):
         """
         Generate a clone for a given Twitter user.
         """
-        self.username = username
-        user_tweets = twitter.tweets(username, count=2000)
-
-        # { POS tag: words }
-        self.vocabulary = {}
-
-        # Mad-lib Tweet patterns.
-        self.patterns = []
+        user_tweets = twitter.tweets(self.username, count=2000)
 
         for tweet in user_tweets:
             text = tweet['body']
