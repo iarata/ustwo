@@ -15,10 +15,9 @@ def clones():
     form = CloneForm()
     if form.validate_on_submit():
         username = form.username.data
-        if not Clone.objects.get(username=username):
-            clone = Clone()
-            clone.imprint(username)
-            clone.save()
+        clone = Clone.objects.get_or_create(username=username)
+        clone.imprint(username)
+        clone.save()
         return redirect(url_for('clones.clone', username=username))
     return render_template('clones/create.jade', form=form)
 
