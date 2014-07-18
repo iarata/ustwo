@@ -41,19 +41,29 @@ def tweets(username, count=200):
                 'retweeted': tweet.retweeted
             } for tweet in tweets]
 
+def user_exists(username):
+    try:
+        api.get_user(username)
+    except TweepError as e:
+        if e.response.status == 404:
+            return False
+        else:
+            raise e
+    return True
+
 def retweet(id):
     """
     Retweet a tweet by id.
     """
     try:
         api.retweet(id)
-    except TweepError as err:
+    except TweepError as e:
         # Assume we may have violated some rate limit
         # and forget about it
-        if '403' in err:
+        if e.response.status == 403:
             print('403 error when trying to retweet. Possibly hit a rate limit.')
         else:
-            raise err
+            raise e
 
 
 def tweet(text):

@@ -1,4 +1,5 @@
-from flask import Blueprint, request, render_template, redirect, url_for, flash
+from flask import Blueprint, request, render_template, redirect, url_for, flash, abort
+from app import twitter
 from app.models import Clone
 from app.forms import CloneForm
 from app.tasks import imprint
@@ -16,11 +17,14 @@ def clones():
     form = CloneForm()
     if form.validate_on_submit():
         username = form.username.data
-        clone, was_created = Clone.objects.get_or_create(username=username)
-        clone.imprinting = True
-        clone.save()
-        imprint.delay(username)
-        return redirect(url_for('clones.clone', username=username))
+        if twitter.user_exists(username):
+            clone, was_created = Clone.objects.get_or_create(username=username)
+            clone.imprinting = True
+            clone.save()
+            imprint.delay(username)
+            return redirect(url_for('clones.clone', username=username))
+        else:
+            abort(404)
     return render_template('clones/create.jade', form=form)
 
 
