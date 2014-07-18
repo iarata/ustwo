@@ -26,6 +26,7 @@ gem install sass
 cd /srv
 git clone https://github.com/publicscience/ustwo.git
 cd /srv/ustwo
+mv config-sample.py config.py
 source /env/ustwo/bin/activate
 pip install -r requirements.txt
 bower install
@@ -44,3 +45,6 @@ sudo cp /srv/ustwo/setup/nginx/*.conf /etc/nginx/conf.d/
 # Restart
 sudo service nginx restart
 sudo service supervisor restart
+
+# Warning
+echo -e "\n\nYou should edit /srv/ustwo/config.py for your settings, then restart supervisor.\n\n"
