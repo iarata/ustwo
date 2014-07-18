@@ -1,6 +1,7 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 from app.models import Clone
 from app.forms import CloneForm
+from app.tasks import imprint
 import re
 
 bp = Blueprint('clones', __name__, url_prefix = '/clones')
@@ -16,8 +17,9 @@ def clones():
     if form.validate_on_submit():
         username = form.username.data
         clone, was_created = Clone.objects.get_or_create(username=username)
-        clone.imprint()
+        clone.imprinting = True
         clone.save()
+        imprint.delay(username)
         return redirect(url_for('clones.clone', username=username))
     return render_template('clones/create.jade', form=form)
 

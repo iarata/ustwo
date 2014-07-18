@@ -9,6 +9,7 @@ from app import db, twitter
 class Clone(db.Document):
     created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
     username = db.StringField(required=True, unique=True)
+    imprinting = db.BooleanField(default=False)
 
     # Mad-lib Tweet patterns.
     patterns = db.ListField(db.StringField(), default=[])
@@ -24,7 +25,8 @@ class Clone(db.Document):
 
     def imprint(self):
         """
-        Generate a clone for a given Twitter user.
+        Generate a clone for a given Twitter user
+        by analyzing their Twitter history.
         """
         user_tweets = twitter.tweets(self.username, count=2000)
 

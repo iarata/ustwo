@@ -22,3 +22,5 @@ app.jinja_env.add_extension('pyjade.ext.jinja.PyJadeExtension')
 # Register blueprints
 from app import routes
 app.register_blueprint(routes.clones.bp)
+
+from app import logging
